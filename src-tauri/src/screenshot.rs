@@ -7,9 +7,11 @@ use std::io::ErrorKind::WouldBlock;
 use std::thread;
 use std::time::Duration;
 
+use chrono::Utc;
+
 pub fn capture() {
     let one_second = Duration::new(1, 0);
-    let one_frame = one_second;
+    let one_frame = one_second / 60;
 
     let display = Display::primary().expect("Couldn't find primary display.");
     let mut capturer = Capturer::new(display).expect("Couldn't begin capture.");
@@ -47,15 +49,18 @@ pub fn capture() {
 
         // Save the image.
 
+        let dt = Utc::now();
+        let current_time = dt.naive_local();
+
         repng::encode(
-            File::create("screenshot.png").unwrap(),
+            File::create(format!("{}.png", current_time)).unwrap(),
             w as u32,
             h as u32,
             &bitflipped,
         )
         .unwrap();
 
-        println!("Image saved to `screenshot.png`.");
+        println!("Image saved to `{}.png`.", current_time);
         break;
     }
 }
