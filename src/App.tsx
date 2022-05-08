@@ -10,8 +10,10 @@ function App() {
     invoke('start', { capture: 'fullscreen' }).then((message) => {
       if (message == '200') {
         setRecording(true)
+      } else if (message == '400') {
+        alert('Error: Already recording')
       } else {
-        console.log('Error starting recording')
+        alert("Error: Couldn't Starting recording")
       }
     })
   }
@@ -21,7 +23,7 @@ function App() {
       if (message == '200') {
         setRecording(false)
       } else {
-        console.log('Error stopping recording')
+        alert('Error: Unknown Error while Stopping recording')
       }
     })
     setRecording(false)
@@ -41,25 +43,26 @@ function App() {
       <hr />
 
       <div className='actions'>
-        <div className='group'>
-          <button
-            id='startBtn'
-            className='button primary'
-            onClick={() => startRecording()}
-          >
-            Start
-          </button>
-          <button
-            id='stopBtn'
-            className='button warning'
-            onClick={() => stopRecording()}
-          >
-            Stop
-          </button>
-        </div>
-        <button id='videoSelectBtn' className='button text'>
-          Choose a Video Source
+        {/* <div className='group'> */}
+        <button
+          id='startBtn'
+          className='button primary'
+          onClick={() => startRecording()}
+        >
+          ⏺ Start
         </button>
+        <button
+          id='stopBtn'
+          className='button warning'
+          onClick={() => stopRecording()}
+        >
+          ⏸ Stop
+        </button>
+        {/* </div> */}
+        {/* LETS TRY WITH JUST FULLSCREEN BEFORE THIS */}
+        {/* <button id='videoSelectBtn' className='button text'>
+          Choose a Video Source
+        </button> */}
       </div>
     </div>
   )
