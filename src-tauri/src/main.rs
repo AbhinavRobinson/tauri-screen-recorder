@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+pub mod screenshot;
+
 static mut RECORDING: bool = false;
 
 fn main() {
@@ -21,6 +23,13 @@ fn start(capture: String) -> String {
         } else {
             println!("Starting Recording... {}", capture);
             RECORDING = true;
+            // catch panic
+            std::panic::catch_unwind(|| {
+                screenshot::capture();
+            })
+            .unwrap_or_else(|_| {
+                println!("Error while capturing...");
+            });
             "200".into()
         }
     }

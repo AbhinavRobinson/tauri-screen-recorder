@@ -13,7 +13,7 @@ function App() {
       } else if (message == '400') {
         alert('Error: Already recording')
       } else {
-        alert("Error: Couldn't Starting recording")
+        alert("Error: Couldn't starting recording")
       }
     })
   }
