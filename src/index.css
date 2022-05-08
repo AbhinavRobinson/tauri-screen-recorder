@@ -14,3 +14,11 @@ body {
   text-align: center;
   padding-top: 20px;
 }
+
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+}

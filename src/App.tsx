@@ -7,12 +7,14 @@ function App() {
 
       <video></video>
 
-      <button id='startBtn' className='button is-primary'>
-        Start
-      </button>
-      <button id='stopBtn' className='button is-warning'>
-        Stop
-      </button>
+      <div className='actions'>
+        <button id='startBtn' className='button is-primary'>
+          Start
+        </button>
+        <button id='stopBtn' className='button is-warning'>
+          Stop
+        </button>
+      </div>
 
       <hr />
 
