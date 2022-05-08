@@ -1,14 +1,29 @@
 import React from 'react'
 import './App.css'
 
+import { invoke } from '@tauri-apps/api/tauri'
+
 function App() {
   const [recording, setRecording] = React.useState(false)
 
   const startRecording = () => {
-    setRecording(true)
+    invoke('start', { capture: 'fullscreen' }).then((message) => {
+      if (message == '200') {
+        setRecording(true)
+      } else {
+        console.log('Error starting recording')
+      }
+    })
   }
 
   const stopRecording = () => {
+    invoke('stop').then((message) => {
+      if (message == '200') {
+        setRecording(false)
+      } else {
+        console.log('Error stopping recording')
+      }
+    })
     setRecording(false)
   }
 
