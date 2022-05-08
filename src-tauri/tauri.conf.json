@@ -56,7 +56,7 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 660,
+        "height": 560,
         "resizable": false,
         "title": "Screen Recorder",
         "width": 800

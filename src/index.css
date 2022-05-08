@@ -11,14 +11,74 @@ video {
 }
 
 body {
+  background-color: #333;
+  color: white;
   text-align: center;
   padding-top: 20px;
+}
+
+h1 {
+  font-size: 2em;
+  margin: 0;
+  padding: 0;
+}
+
+/* blinking animation */
+.recording {
+  animation: blinker 1.5s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+hr {
+  border: 0.5px solid #666;
+}
+
+button {
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition-duration: 300ms;
 }
 
 .actions {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 25px;
+  padding: 0 25px;
+}
+
+.primary {
+  color: #64f795;
+}
+
+.primary:hover {
+  background-color: #64f79511;
+}
+
+.warning {
+  color: #f9c851;
+}
+
+.warning:hover {
+  background-color: #f9c85111;
+}
+
+.text {
+  font-size: 1rem;
+}
+
+.text:hover {
+  background-color: #ffffff11;
 }

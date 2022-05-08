@@ -1,26 +1,51 @@
+import React from 'react'
 import './App.css'
 
 function App() {
+  const [recording, setRecording] = React.useState(false)
+
+  const startRecording = () => {
+    setRecording(true)
+  }
+
+  const stopRecording = () => {
+    setRecording(false)
+  }
+
   return (
     <div className='content'>
-      <h1>⚡ Tauri Screen Recorder</h1>
+      <h1>
+        <span className={recording ? 'recording' : ''}>
+          {recording ? '🔴' : '⚫️'}{' '}
+        </span>
+        Tauri Screen Recorder
+      </h1>
 
       <video></video>
 
-      <div className='actions'>
-        <button id='startBtn' className='button is-primary'>
-          Start
-        </button>
-        <button id='stopBtn' className='button is-warning'>
-          Stop
-        </button>
-      </div>
-
       <hr />
 
-      <button id='videoSelectBtn' className='button is-text'>
-        Choose a Video Source
-      </button>
+      <div className='actions'>
+        <div className='group'>
+          <button
+            id='startBtn'
+            className='button primary'
+            onClick={() => startRecording()}
+          >
+            Start
+          </button>
+          <button
+            id='stopBtn'
+            className='button warning'
+            onClick={() => stopRecording()}
+          >
+            Stop
+          </button>
+        </div>
+        <button id='videoSelectBtn' className='button text'>
+          Choose a Video Source
+        </button>
+      </div>
     </div>
   )
 }
