@@ -52,8 +52,11 @@ pub fn capture() {
         let dt = Utc::now();
         let current_time = dt.naive_local();
 
+        let mut save_directory = std::env::current_dir().unwrap();
+        save_directory.push(format!("{}.png", current_time.format("%Y-%m-%d_%H-%M-%S")));
+
         repng::encode(
-            File::create(format!("{}.png", current_time)).unwrap(),
+            File::create(save_directory).unwrap(),
             w as u32,
             h as u32,
             &bitflipped,
