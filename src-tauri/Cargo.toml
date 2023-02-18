@@ -21,6 +21,7 @@ tauri = { version = "2.0.0-alpha.3", features = ["api-all"] }
 scrap = "0.5.0"
 repng = "0.2.2"
 chrono = "0.4.23"
+screenshots = "0.5.2"
 
 [features]
 # by default Tauri runs in production mode
