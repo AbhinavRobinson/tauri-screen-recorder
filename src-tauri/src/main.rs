@@ -24,7 +24,7 @@ fn start(capture: String) -> String {
             println!("Starting Recording... {}", capture);
             RECORDING = true;
             std::panic::catch_unwind(|| {
-                RECORDING = screenshot::capture();
+                screenshot::capture();
             })
             .unwrap_or_else(|_| {
                 println!("Error while capturing...");

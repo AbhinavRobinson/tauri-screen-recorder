@@ -22,6 +22,7 @@ scrap = "0.5.0"
 repng = "0.2.2"
 chrono = "0.4.23"
 screenshots = "0.5.2"
+core-graphics = "0.22.3"
 
 [features]
 # by default Tauri runs in production mode
