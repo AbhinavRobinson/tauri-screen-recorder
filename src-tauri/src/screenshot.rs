@@ -1,13 +1,5 @@
-use std::time::Instant;
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 use xcap::Monitor;
-
-fn normalized(filename: &str) -> String {
-    filename
-        .replace("|", "")
-        .replace("\\", "")
-        .replace(":", "")
-        .replace("/", "")
-}
 
 pub fn capture() {
     let start = Instant::now();
@@ -15,9 +7,15 @@ pub fn capture() {
 
     for monitor in monitors {
         let image = monitor.capture_image().unwrap();
-
         image
-            .save(format!("target/monitor-{}.png", normalized(monitor.name())))
+            .save(format!(
+                "../screenshot-{}-{}.png",
+                monitor.id(),
+                SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .expect("time error")
+                    .as_secs()
+            ))
             .unwrap();
     }
     println!("Done: {:?}", start.elapsed());
