@@ -4,13 +4,13 @@ import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 
 function App() {
-  const [recording, setRecording] = React.useState(false);
+  const [isBusy, setIsBusy] = React.useState(false);
 
   const screenshot = () => {
-    setRecording(true);
+    setIsBusy(true);
     invoke("screenshot", { capture: "fullscreen" }).then((message) => {
       if (message == "200") {
-        stopRecording();
+        free();
       } else if (message == "400") {
         alert("Error: Already recording");
       } else {
@@ -19,23 +19,18 @@ function App() {
     });
   };
 
-  const stopRecording = () => {
-    setRecording(false);
+  const free = () => {
+    setIsBusy(false);
   };
 
   return (
     <div className="content">
       <h1>
-        <span className={recording ? "recording" : ""}>
-          {recording ? "🔴" : "⚫️"}{" "}
+        <span className={isBusy ? "recording" : ""}>
+          {isBusy ? "🔴" : "⚫️"}{" "}
         </span>
         Tauri Screen Recorder
       </h1>
-
-      <video></video>
-
-      <hr />
-
       <div className="actions">
         <button
           id="startBtn"
