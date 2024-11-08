@@ -20,13 +20,6 @@ function App() {
   };
 
   const stopRecording = () => {
-    invoke("stop").then((message) => {
-      if (message == "200") {
-        setRecording(false);
-      } else {
-        alert("Error: Unknown Error while Stopping recording");
-      }
-    });
     setRecording(false);
   };
 
