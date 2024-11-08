@@ -12,9 +12,9 @@ function App() {
       if (message == "200") {
         free();
       } else if (message == "400") {
-        alert("Error: Already recording");
+        alert("Error: Already captured");
       } else {
-        alert("Error: Couldn't starting recording");
+        alert("Error: Couldn't starting capture");
       }
     });
   };
@@ -26,7 +26,7 @@ function App() {
   return (
     <div className="content">
       <h1>
-        <span className={isBusy ? "recording" : ""}>
+        <span className={isBusy ? "capturing" : ""}>
           {isBusy ? "🔴" : "⚫️"}{" "}
         </span>
         Tauri Screen Recorder
