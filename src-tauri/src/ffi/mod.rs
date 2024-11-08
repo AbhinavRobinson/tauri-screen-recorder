@@ -56,9 +56,8 @@ fn test_core_graphics2() {
 
         println!("Stream: {:?}", stream);
 
-        let loop_source = stream.run_loop_source().unwrap();
+        stream.run_loop_source().unwrap();
 
-        loop_source;
         // println!("Loop Source: {:}", loop_source);
 
         // loop {
