@@ -1,50 +1,65 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import React from "react";
 import "./App.css";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+import { invoke } from "@tauri-apps/api/core";
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+function App() {
+  const [recording, setRecording] = React.useState(false);
+
+  const startRecording = () => {
+    setRecording(true);
+    invoke("start", { capture: "fullscreen" }).then((message) => {
+      if (message == "200") {
+        stopRecording();
+      } else if (message == "400") {
+        alert("Error: Already recording");
+      } else {
+        alert("Error: Couldn't starting recording");
+      }
+    });
+  };
+
+  const stopRecording = () => {
+    invoke("stop").then((message) => {
+      if (message == "200") {
+        setRecording(false);
+      } else {
+        alert("Error: Unknown Error while Stopping recording");
+      }
+    });
+    setRecording(false);
+  };
 
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+    <div className="content">
+      <h1>
+        <span className={recording ? "recording" : ""}>
+          {recording ? "🔴" : "⚫️"}{" "}
+        </span>
+        Tauri Screen Recorder
+      </h1>
 
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <video></video>
+
+      <hr />
+
+      <div className="actions">
+        <button
+          id="startBtn"
+          className="button primary"
+          onClick={() => startRecording()}
+        >
+          ⏺ Start
+        </button>
+        <button
+          id="stopBtn"
+          className="button warning"
+          onClick={() => stopRecording()}
+        >
+          ⏸ Stop
+        </button>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    </div>
   );
 }
 
