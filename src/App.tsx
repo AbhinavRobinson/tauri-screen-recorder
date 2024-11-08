@@ -6,9 +6,9 @@ import { invoke } from "@tauri-apps/api/core";
 function App() {
   const [recording, setRecording] = React.useState(false);
 
-  const startRecording = () => {
+  const screenshot = () => {
     setRecording(true);
-    invoke("start", { capture: "fullscreen" }).then((message) => {
+    invoke("screenshot", { capture: "fullscreen" }).then((message) => {
       if (message == "200") {
         stopRecording();
       } else if (message == "400") {
@@ -40,16 +40,9 @@ function App() {
         <button
           id="startBtn"
           className="button primary"
-          onClick={() => startRecording()}
+          onClick={() => screenshot()}
         >
-          ⏺ Start
-        </button>
-        <button
-          id="stopBtn"
-          className="button warning"
-          onClick={() => stopRecording()}
-        >
-          ⏸ Stop
+          ⏺ Screenshot
         </button>
       </div>
     </div>
