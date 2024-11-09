@@ -4,52 +4,40 @@ import "./App.css";
 import { invoke } from "@tauri-apps/api/core";
 
 function App() {
-  const [recording, setRecording] = React.useState(false);
+  const [isBusy, setIsBusy] = React.useState(false);
 
-  const startRecording = () => {
-    setRecording(true);
-    invoke("start", { capture: "fullscreen" }).then((message) => {
+  const screenshot = () => {
+    setIsBusy(true);
+    invoke("screenshot", { capture: "fullscreen" }).then((message) => {
       if (message == "200") {
-        stopRecording();
+        free();
       } else if (message == "400") {
-        alert("Error: Already recording");
+        alert("Error: Already captured");
       } else {
-        alert("Error: Couldn't starting recording");
+        alert("Error: Couldn't starting capture");
       }
     });
   };
 
-  const stopRecording = () => {
-    setRecording(false);
+  const free = () => {
+    setIsBusy(false);
   };
 
   return (
     <div className="content">
       <h1>
-        <span className={recording ? "recording" : ""}>
-          {recording ? "🔴" : "⚫️"}{" "}
+        <span className={isBusy ? "capturing" : ""}>
+          {isBusy ? "🔴" : "⚫️"}{" "}
         </span>
         Tauri Screen Recorder
       </h1>
-
-      <video></video>
-
-      <hr />
-
       <div className="actions">
         <button
           id="startBtn"
           className="button primary"
-          onClick={() => startRecording()}
+          onClick={() => screenshot()}
         >
-          ⏺ Start
-        </button>
-        <button
-          id="stopBtn"
-          className="button warning"
-          onClick={() => stopRecording()}
-        >
-          ⏸ Stop
+          ⏺ Screenshot
         </button>
       </div>
     </div>

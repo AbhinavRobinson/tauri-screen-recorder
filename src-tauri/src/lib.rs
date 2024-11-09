@@ -3,13 +3,13 @@ pub mod screenshot;
 static mut RECORDING: bool = false;
 
 #[tauri::command]
-fn start(capture: String) -> String {
+fn screenshot(capture: String) -> String {
     unsafe {
         if RECORDING {
-            println!("Already Recording...");
+            println!("Captured Screenshot...");
             "400".into()
         } else {
-            println!("Starting Recording... {}", capture);
+            println!("Capturing Screenshot... {}", capture);
             RECORDING = true;
             std::panic::catch_unwind(|| {
                 screenshot::capture();
@@ -27,7 +27,7 @@ fn start(capture: String) -> String {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![start])
+        .invoke_handler(tauri::generate_handler![screenshot])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
