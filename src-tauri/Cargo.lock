@@ -3978,7 +3978,9 @@ version = "0.1.0"
 dependencies = [
  "core-foundation",
  "core-graphics2",
+ "dispatch2",
  "image",
+ "io-surface",
  "serde",
  "serde_json",
  "tauri",

@@ -1,15 +1,22 @@
+use std::sync::mpsc;
+
 use core_foundation::{
     base::{CFType, TCFType},
+    boolean::CFBoolean,
     dictionary::CFDictionary,
+    number::CFNumber,
+    runloop::{CFRunLoop, CFRunLoopMode},
     string::CFString,
 };
 use core_graphics2::{
     display::{CGDisplayBounds, CGDisplayScreenSize, CGMainDisplayID},
-    display_stream::CGDisplayStream,
+    display_stream::{CGDisplayStream, CGDisplayStreamGetRunLoopSource},
     image::CGImagePixelFormatInfo,
 };
+use dispatch2::{Queue, QueueAttribute};
+use io_surface::{IOSurface, IOSurfaceGetHeight, IOSurfaceGetWidth};
 
-fn test_core_graphics2() {
+pub fn ffi_loop() {
     println!("Hello, world!");
 
     let display;
@@ -27,37 +34,93 @@ fn test_core_graphics2() {
     println!("Width: {:?}", output_width);
     println!("Height: {:?}", output_height);
     let pixel_format = 1111970369;
-    // TODO:
-    let properties: CFDictionary<CFString, CFType> = CFDictionary::from_CFType_pairs(&[]);
+    let fps: u32 = 1;
+    let properties: CFDictionary<CFString, CFType> = CFDictionary::from_CFType_pairs(&[
+        (
+            CFString::from_static_string("kCGDisplayStreamShowCursor"),
+            CFBoolean::true_value().as_CFType(),
+        ),
+        (
+            CFString::from_static_string("kCGDisplayStreamMinimumFrameTime"),
+            CFNumber::from(fps as i32).as_CFType(),
+        ),
+    ]);
 
-    let resp = CGDisplayStream::new(
+    let queue = Queue::new("label", QueueAttribute::Serial);
+
+    let resp = CGDisplayStream::new_with_dispatch_queue(
         display,
         output_width,
         output_height,
         pixel_format,
         &properties,
-        |status, image, _time, _o| {
+        &queue,
+        |status, timestamp, iosurface, update| {
             println!("Status: {:?}", status);
-            println!("Image: {:?}", image);
-            // println!("Time: {:?}", time);
-            _o.unwrap();
+            println!("Timestamp: {:?}", timestamp);
+            // let mut data = [];
+            let surface = iosurface.unwrap();
+            let update = update.unwrap();
+
+            unsafe {
+                let h = IOSurfaceGetHeight(surface.as_concrete_TypeRef());
+                println!("Height: {:?}", h);
+                let w = IOSurfaceGetWidth(surface.as_concrete_TypeRef());
+                println!("Width: {:?}", w);
+            }
+
+            println!("Update: {:?}\n", update.drop_count());
+
+            // _o.unwrap();
         },
     );
 
     if resp.is_err() {
         eprintln!("Error: {:?}", resp.err());
     } else {
-        let stream = resp.expect("Stream is None");
-        let x = stream.run_loop_source().unwrap().show();
-        println!("X: {:?}", x);
-        let err = stream.start();
+        let stream: CGDisplayStream = resp.expect("Stream is None");
+        // let x = stream.run_loop_source();
 
-        println!("Error: {:?}", err);
+        stream.start();
 
-        println!("Stream: {:?}", stream);
+        // std::thread::sleep(std::time::Duration::from_secs(5));
+        // stream.stop();
 
-        stream.run_loop_source().unwrap();
+        CFRunLoop::run_current();
 
+        // if b.try_recv().is_ok() {
+        //     println!("Received");
+        //     stream.start();
+        // }
+
+        // let source = stream.run_loop_source().unwrap();
+
+        // // let value = stream.start();
+
+        // // println!("Value: {:?}", value);
+
+        // let current_loop = CFRunLoop::get_current();
+        // let mode = CFString::from_static_string("kCFRunLoopDefaultMode").as_concrete_TypeRef();
+
+        // let x = current_loop.contains_source(&source, mode);
+        // println!("Contains Source: {:?}", x);
+
+        // CFRunLoop::run_current();
+
+        // current_loop.add_source(&source, mode);
+        // println!("Value: {:?}", value);
+
+        // CFRunLoop::run_current();
+
+        // let current_loop = CFRunLoop::get_current();
+
+        // ?
+        // let mode = CFString::from_static_string("");
+        // println!("Current Loop: {:?}", current_loop);
+
+        // let loop_source = stream.run_loop_source().unwrap();
+
+        // loop_source.;
         // println!("Loop Source: {:}", loop_source);
 
         // loop {
