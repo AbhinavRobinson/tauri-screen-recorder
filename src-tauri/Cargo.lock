@@ -529,6 +529,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "core-video"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d45e71d5be22206bed53c3c3cb99315fc4c3d31b8963808c6bc4538168c4f8ef"
+dependencies = [
+ "block",
+ "core-foundation",
+ "core-graphics2",
+ "io-surface",
+ "libc",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3978,6 +3991,7 @@ version = "0.1.0"
 dependencies = [
  "core-foundation",
  "core-graphics2",
+ "core-video",
  "dispatch2",
  "image",
  "io-surface",
