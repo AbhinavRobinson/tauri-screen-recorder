@@ -1,5 +1,5 @@
 use std::{
-    any::Any,
+    collections::VecDeque,
     sync::{mpsc, Arc, Mutex},
     time::Instant,
 };
@@ -13,17 +13,28 @@ use core_foundation::{
     string::CFString,
 };
 use core_graphics2::{
-    display::{CGDisplayBounds, CGDisplayCreateImage, CGMainDisplayID},
+    display::{CGDisplayBounds, CGMainDisplayID},
     display_stream::{CGDisplayStream, CGDisplayStreamFrameStatus},
 };
-use core_video::{
-    buffer::TCVBuffer,
-    image_buffer::TCVImageBuffer,
-    pixel_buffer::{kCVPixelBufferLock_ReadOnly, CVPixelBuffer},
-};
+use core_video::pixel_buffer::{kCVPixelBufferLock_ReadOnly, CVPixelBuffer};
 use dispatch2::{Queue, QueueAttribute};
-use image::RgbImage;
 use io_surface::{IOSurfaceGetHeight, IOSurfaceGetWidth};
+
+struct ImgDataStore {
+    bytes_per_row: usize,
+    height: usize,
+    width: usize,
+}
+
+impl ImgDataStore {
+    fn new(bytes_per_row: usize, height: usize, width: usize) -> Self {
+        Self {
+            bytes_per_row,
+            height,
+            width,
+        }
+    }
+}
 
 pub fn ffi_loop() {
     println!("Hello, world!");
@@ -85,7 +96,6 @@ pub fn ffi_loop() {
                 eprintln!("Error: {:?}", status);
                 return;
             }
-            let update = update.unwrap();
             let h;
             let w;
             unsafe {
@@ -125,31 +135,39 @@ pub fn ffi_loop() {
             pixel_send
                 .send((data, bytes_per_row, h, w, timestamp))
                 .unwrap();
-            println!("sending")
+
             // pb.unlock_base_address(kCVPixelBufferLock_ReadOnly);
         },
     );
 
     if resp.is_err() {
         eprintln!("Error: {:?}", resp.err());
-    } else {
-        let stream: CGDisplayStream = resp.expect("Stream is None");
-        // let x = stream.run_loop_source();
+        panic!("Failed to create stream");
+    }
+    let stream: CGDisplayStream = resp.expect("Stream is None");
+    // let x = stream.run_loop_source();
 
-        stream.start();
+    stream.start();
 
-        // std::thread::sleep(std::time::Duration::from_secs(5));
-        // stream.stop();
+    // std::thread::sleep(std::time::Duration::from_secs(5));
+    // stream.stop();
 
-        let t1 = std::thread::spawn(|| {
-            CFRunLoop::run_current();
-        });
+    let t1 = std::thread::spawn(|| {
+        CFRunLoop::run_current();
+    });
 
-        // let duration = std::time::Duration::from_secs(5);
+    // let duration = std::time::Duration::from_secs(5);
 
-        let mut count = 0;
-        let img_array = Arc::new(Mutex::new(Vec::new()));
+    let mut count = 0;
+    let img_array = Arc::new(Mutex::new(VecDeque::new()));
 
+    let img_data = Arc::new(Mutex::new(ImgDataStore::new(0, 0, 0)));
+
+    let mut img_val_set = false;
+
+    let img_array1 = img_array.clone();
+
+    std::thread::spawn(move || {
         loop {
             let received = pixel_recv.try_recv();
 
@@ -158,64 +176,59 @@ pub fn ffi_loop() {
 
                 let (data, bytes_per_row, h, w, _timestamp) = received.unwrap();
 
+                let mut send_data = Vec::new();
+
+                for y in 0..h {
+                    for x in 0..w {
+                        let index = (y * bytes_per_row + x * 4) as usize;
+                        let r = data[index];
+                        let g = data[index + 1];
+                        let b = data[index + 2];
+
+                        let y = (0.299 * r as f32 + 0.587 * g as f32 + 0.114 * b as f32) as u8;
+                        let u = ((b as f32 - y as f32) * 0.493) as u8;
+                        let v = ((r as f32 - y as f32) * 0.877) as u8;
+
+                        send_data.push(y);
+                        send_data.push(u);
+                        send_data.push(v);
+                    }
+                }
+
+                if !img_val_set {
+                    let mut lock = img_data.lock();
+                    let img_data_store = lock.as_mut().unwrap();
+
+                    img_data_store.bytes_per_row = bytes_per_row;
+                    img_data_store.height = h;
+                    img_data_store.width = w;
+                    img_val_set = true;
+                }
+
                 let img_array = img_array.clone();
 
                 let t = std::thread::spawn(move || {
-                    println!("Received in");
+                    let mut lock = img_array.lock();
 
-                    let x = &mut img_array.lock().as_mut().unwrap().push(data);
+                    let img_array = lock.as_mut().unwrap();
 
-                    println!("Received: {:?}", img_array.lock().as_ref().unwrap().len());
+                    img_array.push_back(send_data);
                 });
 
                 t.join().unwrap();
                 // t.join().unwrap();
             }
         }
+    });
 
-        // t1.join().unwrap();
+    std::thread::spawn(move || {
+        loop {
+            // sleep
+            std::thread::sleep(std::time::Duration::from_secs(1));
+            let img_array = img_array1.clone();
 
-        // queue.suspend();
-
-        // stream.stop();
-
-        // if b.try_recv().is_ok() {
-        //     println!("Received");
-        //     stream.start();
-        // }
-
-        // let source = stream.run_loop_source().unwrap();
-
-        // // let value = stream.start();
-
-        // // println!("Value: {:?}", value);
-
-        // let current_loop = CFRunLoop::get_current();
-        // let mode = CFString::from_static_string("kCFRunLoopDefaultMode").as_concrete_TypeRef();
-
-        // let x = current_loop.contains_source(&source, mode);
-        // println!("Contains Source: {:?}", x);
-
-        // CFRunLoop::run_current();
-
-        // current_loop.add_source(&source, mode);
-        // println!("Value: {:?}", value);
-
-        // CFRunLoop::run_current();
-
-        // let current_loop = CFRunLoop::get_current();
-
-        // ?
-        // let mode = CFString::from_static_string("");
-        // println!("Current Loop: {:?}", current_loop);
-
-        // let loop_source = stream.run_loop_source().unwrap();
-
-        // loop_source.;
-        // println!("Loop Source: {:}", loop_source);
-
-        // loop {
-        //     std::thread::sleep(std::time::Duration::from_secs(1));
-        // }
-    }
+            // save to video
+        }
+    });
+    loop {}
 }

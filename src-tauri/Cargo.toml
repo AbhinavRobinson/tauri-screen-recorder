@@ -1,9 +1,9 @@
 [package]
+authors = ["you"]
+description = "A Tauri App"
+edition = "2021"
 name = "tauri-screen-recorder"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -11,21 +11,21 @@ edition = "2021"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "tauri_screen_recorder_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
+name = "tauri_screen_recorder_lib"
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = {version = "2", features = []}
 
 [dependencies]
-tauri = { version = "2", features = [] }
-tauri-plugin-shell = "2"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-xcap = "0.0.14"
-image = "0.25.5"
 core-foundation = "0.10.0"
 core-graphics2 = "0.4.1"
-dispatch2 = "0.1.0"
-io-surface = "0.16.0"
 core-video = "0.4.3"
+dispatch2 = "0.1.0"
+image = "0.25.5"
+io-surface = "0.16.0"
+serde = {version = "1", features = ["derive"]}
+serde_json = "1"
+tauri = {version = "2", features = []}
+tauri-plugin-shell = "2"
+xcap = "0.0.14"
